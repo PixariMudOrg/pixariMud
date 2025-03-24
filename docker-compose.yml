@@ -1,0 +1,10 @@
+services:
+  evennia:
+    image: snocrash/pixarimud
+    stdin_open: true
+    tty: true
+    ports:
+      - "4001-4002:4001-4002"
+      - "4000:4000"
+    volumes: 
+      - .:/usr/src/game
