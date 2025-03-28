@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: evennia
+          MYSQL_USER: evennia_user
+          MYSQL_PASSWORD: evennia_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y default-libmysqlclient-dev build-essential pkg-config
+
+    - name: Install dependencies
+      run: |
+        uv pip install --system ".[dev]"
+
+    - name: Run tests
+      env:
+        EVENNIA_DATABASE: mysql
+        EVENNIA_DB_NAME: evennia
+        EVENNIA_DB_USER: evennia_user
+        EVENNIA_DB_PASSWORD: evennia_password
+        EVENNIA_DB_HOST: localhost
+        EVENNIA_DB_PORT: 3306
+      run: |
+        pytest
+
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Install dependencies
+      run: |
+        uv pip install --system ".[dev]"
+
+    - name: Check dependencies
+      run: |
+        uv pip freeze
+
+    - name: Run ruff checks
+      run: |
+        ruff check .
+        ruff format --check .

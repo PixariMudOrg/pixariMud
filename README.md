@@ -1,3 +1,7 @@
+# PixariMUD
+
+[![Lint](https://github.com/PixariMudOrg/pixariMud/actions/workflows/lint.yml/badge.svg)](https://github.com/PixariMudOrg/pixariMud/actions/workflows/lint.yml)
+
 ## Hi there 👋
 
 # Setup a Development Server
@@ -59,5 +63,3 @@ telnet localhost 4000
 ```
 
 or browse to [http://localhost:4005](http://localhost:4005)
-
-
