@@ -46,16 +46,16 @@ except ImportError:
     print("secret_settings.py file not found or failed to import.")
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('EVENNIA_DB_NAME', 'evennia'),
-        'USER': os.getenv('EVENNIA_DB_USER', 'evennia_user'),
-        'PASSWORD': os.getenv('EVENNIA_DB_PASSWORD', 'evennia_password'),
-        'HOST': os.getenv('EVENNIA_DB_HOST', 'mariadb'),
-        'PORT': os.getenv('EVENNIA_DB_PORT', '3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'use_unicode': True,
-        }
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("EVENNIA_DB_NAME", "evennia"),
+        "USER": os.getenv("EVENNIA_DB_USER", "evennia_user"),
+        "PASSWORD": os.getenv("EVENNIA_DB_PASSWORD", "evennia_password"),
+        "HOST": os.getenv("EVENNIA_DB_HOST", "mariadb"),
+        "PORT": os.getenv("EVENNIA_DB_PORT", "3306"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "use_unicode": True,
+        },
     }
 }

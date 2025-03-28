@@ -18,4 +18,11 @@ setup:
 		default-libmysqlclient-dev \
 		build-essential
 
+dev-setup:
+	uv run pre-commit install
+
+lint:
+	uv run ruff check --fix pixarimud/
+	uv run ruff format pixarimud/
+
 # TODO: Add docker installation for the on-server setup so it's easy and consistent with a make setup && make deploy
