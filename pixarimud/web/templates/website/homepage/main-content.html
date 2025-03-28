@@ -1,0 +1,53 @@
+<h1 class="card-title">Welcome to PixariMUD!</h1>
+
+<hr/>
+
+<p class="lead">The Python MUD/MU* evennia based game, PixariMUD!</p>
+
+<p>
+    Man, here we are, starting to build out a whole ass website!
+</p>
+
+{% if webclient_enabled %}
+
+<p><a href="{% url 'webclient:index' %}" class="playbutton">Play in the browser!</a></p>
+
+{% endif %}
+{% if telnet_enabled %}
+<p>
+    Telnet: <strong>{{ server_hostname }}</strong>, port
+    {% for port in telnet_ports %}
+    {% if not forloop.first and forloop.last %} or
+    {% elif forloop.counter != 1 %},
+    {% endif %}
+    <strong>{{ port }}</strong>
+    {% endfor %}
+</p>
+{% endif %}
+{% if telnet_ssl_enabled %}
+<p>
+    Telnet (SSL): <strong>{{ server_hostname }}</strong>, port
+    {% for port in telnet_ssl_ports %}
+    {% if not forloop.first and forloop.last %} or
+    {% elif forloop.counter != 1 %},
+    {% endif %}
+    <strong>{{ port }}</strong>
+    {% endfor %}
+</p>
+{% endif %}
+{% if ssh_enabled %}
+<p>
+    SSH: <strong>{{ server_hostname }}</strong>, port
+    {% for port in ssh_ports %}
+    {% if not forloop.first and forloop.last %} or
+    {% elif forloop.counter != 1 %},
+    {% endif %}
+    <strong>{{ port }}</strong>
+    {% endfor %}
+</p>
+{% endif %}
+<p>
+    Don't hesitate asking questions to the PixariMUD community!<br>file an issue on the github project
+     <a href="https://github.com/PixariMudOrg/pixariMud/issues">PixariMUD issues</a>
+    or come say hi in the <a href="https://discord.gg/kQGN8HsP">Discord support channel</a>.
+</p>

@@ -17,3 +17,5 @@ setup:
 		pkg-config \
 		default-libmysqlclient-dev \
 		build-essential
+
+# TODO: Add docker installation for the on-server setup so it's easy and consistent with a make setup && make deploy
