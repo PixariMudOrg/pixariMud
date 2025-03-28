@@ -1,10 +1,46 @@
 services:
-  evennia:
-    image: snocrash/pixarimud
-    stdin_open: true
-    tty: true
+  pixiarimud:
+    image: pixiarimud
+    build: .
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - DJANGO_SETTINGS_MODULE=server.conf.settings
+      - EVENNIA_DATABASE=mysql
+      - EVENNIA_DB_NAME=evennia
+      - EVENNIA_DB_USER=evennia_user
+      - EVENNIA_DB_PASSWORD=evennia_password  # Changed to match MariaDB service
+      - EVENNIA_DB_HOST=mariadb
+      - EVENNIA_DB_PORT=3306
+      - EVENNIA_SUPERUSER_USERNAME=admin 
+      - EVENNIA_SUPERUSER_PASSWORD=admin123
     ports:
       - "4001-4002:4001-4002"
       - "4000:4000"
     volumes: 
       - .:/usr/src/game
+    depends_on:
+      - mariadb
+    command: sh -c "wait-for-it mariadb:3306 -t 60 -- evennia makemigrations && evennia migrate && evennia start -l"
+
+  mariadb:
+    image: mariadb
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword  # Changed to match
+      - MYSQL_DATABASE=evennia
+      - MYSQL_USER=evennia_user
+      - MYSQL_PASSWORD=evennia_password  # Changed to match Evennia service
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  mariadb_data:
+    driver: local
