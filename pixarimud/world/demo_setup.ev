@@ -1,0 +1,59 @@
+# Demo World Setup Batch Commands
+# 
+# This file contains Evennia batch commands to set up the demo world
+# with all the necessary objects for testing combat, death, and respawn mechanics.
+#
+# To run these commands:
+# 1. Start Evennia server: evennia start
+# 2. Connect as superuser
+# 3. Run: @batchcommand world/demo_setup.ev
+
+# Create the demo arena room
+@dig Combat Training Arena = arena, training ground
+
+# Go to the arena
+@teleport arena
+
+# Set a detailed description for the arena
+@desc here = A spacious training arena with high ceilings and reinforced walls. Various combat training equipment is scattered around the room. This is where warriors come to hone their skills and test new techniques. You can see a combat dummy for basic training, a bottomless pit for testing courage, and a worn-out dummy that might break if hit too much.
+
+# Spawn the demo objects using our prototypes
+@spawn COMBAT_DUMMY
+@spawn BOTTOMLESS_PIT  
+@spawn WORN_DUMMY
+
+# Create a respawn chamber
+@dig Respawn Chamber = chamber, sanctuary, respawn
+
+# Go to respawn chamber to set it up
+@teleport chamber
+
+# Set description for respawn chamber
+@desc here = A mystical chamber where fallen warriors return to life. The air shimmers with magical energy, and soft light emanates from crystalline formations on the walls. This is a safe place for the recently deceased.
+
+# Create an exit back to the arena
+@open arena = Combat Training Arena
+
+# Return to arena
+@teleport arena
+
+# Create an exit to the respawn chamber
+@open respawn = Respawn Chamber
+
+# Set the respawn chamber as the default respawn location for the arena
+# (This would need to be done via code or manually)
+
+# Announce completion
+@echo Demo world setup complete! The arena contains:
+@echo - Combat Dummy: Hit for XP training
+@echo - Bottomless Pit: Jump in to test death/respawn
+@echo - Worn-Out Dummy: Can be destroyed and will respawn
+@echo - Respawn Chamber: Safe location for respawning
+
+@echo 
+@echo Try these commands:
+@echo   hit dummy        - Train combat and gain XP
+@echo   jump pit         - Test death and respawn mechanics  
+@echo   hit worn         - Attack destructible dummy
+@echo   stats            - View your character stats
+@echo   setrespawn       - Set current location as respawn point

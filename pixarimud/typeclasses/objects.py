@@ -9,6 +9,7 @@ with a location in the game world (like Characters, Rooms, Exits).
 """
 
 from evennia.objects.objects import DefaultObject
+from evennia import TICKER_HANDLER
 
 
 class ObjectParent:
@@ -215,3 +216,212 @@ class Object(ObjectParent, DefaultObject):
     """
 
     pass
+
+
+class CombatDummy(Object):
+    """
+    A combat training dummy that can be hit for experience.
+    Players can hit this dummy to gain 1 XP per hit.
+    """
+
+    def at_object_creation(self):
+        """Set up the combat dummy."""
+        super().at_object_creation()
+        self.db.desc = "A sturdy combat training dummy. You can 'hit dummy' to practice combat and gain experience."
+        self.db.hits_taken = 0
+        
+    def get_hit(self, attacker):
+        """
+        Handle being hit by a player.
+        Awards 1 XP to the attacker.
+        """
+        if not hasattr(attacker, 'gain_experience'):
+            attacker.msg("You can't gain experience!")
+            return
+            
+        self.db.hits_taken += 1
+        
+        # Award experience
+        attacker.gain_experience(1)
+        
+        # Dramatic combat messages
+        attacker.msg(f"|yYou strike the {self.key} with force!|n")
+        attacker.location.msg_contents(
+            f"|y{attacker.key} strikes the {self.key}!|n", 
+            exclude=attacker
+        )
+        
+        # Show hit count occasionally
+        if self.db.hits_taken % 10 == 0:
+            attacker.location.msg_contents(
+                f"|w{self.key} has taken {self.db.hits_taken} hits total.|n"
+            )
+
+    def return_appearance(self, looker, **kwargs):
+        """Customize appearance to show hit count."""
+        appearance = super().return_appearance(looker, **kwargs)
+        if self.db.hits_taken > 0:
+            appearance += f"\n|wThis dummy has been hit {self.db.hits_taken} times.|n"
+        return appearance
+
+
+class BottomlessPit(Object):
+    """
+    A dangerous pit that kills players who jump into it.
+    Players respawn after jumping in.
+    """
+
+    def at_object_creation(self):
+        """Set up the bottomless pit."""
+        super().at_object_creation()
+        self.db.desc = (
+            "A dark, seemingly bottomless pit. The depths are shrouded in darkness. "
+            "You can 'jump pit' or 'jump in pit' if you dare..."
+        )
+        self.db.victims = 0
+
+    def jump_into(self, jumper):
+        """
+        Handle a player jumping into the pit.
+        This kills the player, triggering respawn.
+        """
+        self.db.victims += 1
+        
+        # Dramatic death sequence
+        jumper.msg("|rYou leap into the bottomless pit!|n")
+        jumper.location.msg_contents(
+            f"|r{jumper.key} leaps into the bottomless pit!|n", 
+            exclude=jumper
+        )
+        
+        jumper.msg("|rYou fall... and fall... and fall...|n")
+        jumper.msg("|RThe darkness consumes you!|n")
+        
+        # Kill the player (triggers respawn via Character.die())
+        jumper.db.health = 0
+        jumper.die()
+        
+        # Update pit statistics
+        if self.db.victims % 5 == 0:
+            self.location.msg_contents(
+                f"|w{self.key} has claimed {self.db.victims} victims.|n"
+            )
+
+    def return_appearance(self, looker, **kwargs):
+        """Customize appearance to show victim count."""
+        appearance = super().return_appearance(looker, **kwargs)
+        if self.db.victims > 0:
+            appearance += f"\n|rThis pit has claimed {self.db.victims} victims.|n"
+        return appearance
+
+
+class WornOutDummy(Object):
+    """
+    A combat dummy that can take damage and be destroyed.
+    Has its own health pool and respawns after being destroyed.
+    """
+
+    def at_object_creation(self):
+        """Set up the worn-out dummy."""
+        super().at_object_creation()
+        self.db.desc = (
+            "An old, worn-out combat dummy that looks like it's seen better days. "
+            "You can 'hit dummy' to attack it, but be careful - it might break!"
+        )
+        self.db.health = 100
+        self.db.max_health = 100
+        self.db.hits_given = 0
+        self.db.respawn_location = self.location
+        self.db.respawn_timer = 60  # seconds
+
+    def get_hit(self, attacker):
+        """
+        Handle being hit by a player.
+        Takes 1 damage, awards 1 XP to attacker.
+        Dies when health reaches 0.
+        """
+        if not hasattr(attacker, 'gain_experience'):
+            attacker.msg("You can't gain experience!")
+            return
+            
+        # Take damage
+        self.db.health -= 1
+        self.db.hits_given += 1
+        
+        # Award experience
+        attacker.gain_experience(1)
+        
+        # Combat messages
+        attacker.msg(f"|yYou strike the {self.key}! It has {self.db.health} health left.|n")
+        attacker.location.msg_contents(
+            f"|y{attacker.key} strikes the {self.key}!|n", 
+            exclude=attacker
+        )
+        
+        # Check if dummy is destroyed
+        if self.db.health <= 0:
+            self.die(attacker)
+
+    def die(self, killer=None):
+        """
+        Handle dummy destruction and setup respawn.
+        """
+        if killer:
+            killer.msg(f"|rYou have destroyed the {self.key}!|n")
+            killer.location.msg_contents(
+                f"|r{killer.key} has destroyed the {self.key}!|n", 
+                exclude=killer
+            )
+        
+        self.location.msg_contents(
+            f"|rThe {self.key} collapses into pieces!|n"
+        )
+        
+        # Store respawn data
+        respawn_location = self.db.respawn_location
+        respawn_timer = self.db.respawn_timer
+        
+        # Remove from game temporarily
+        self.move_to(None, quiet=True)
+        
+        # Schedule respawn
+        TICKER_HANDLER.add(
+            interval=respawn_timer,
+            callback=self.respawn,
+            idstring=f"respawn_{self.id}",
+            kwargs={"location": respawn_location}
+        )
+        
+        respawn_location.msg_contents(
+            f"|gA new {self.key} will appear here in {respawn_timer} seconds.|n"
+        )
+
+    def respawn(self, location):
+        """
+        Respawn the dummy at the specified location.
+        """
+        # Reset stats
+        self.db.health = self.db.max_health
+        
+        # Move back to the world
+        self.move_to(location, quiet=True)
+        
+        # Announce respawn
+        location.msg_contents(
+            f"|gA new {self.key} has appeared!|n"
+        )
+        
+        # Remove the ticker
+        TICKER_HANDLER.remove(idstring=f"respawn_{self.id}")
+
+    def return_appearance(self, looker, **kwargs):
+        """Customize appearance to show health and stats."""
+        appearance = super().return_appearance(looker, **kwargs)
+        
+        health_color = 'g' if self.db.health > 50 else 'y' if self.db.health > 20 else 'r'
+        appearance += f"\n|wHealth:|n |{health_color}{self.db.health}|n/{self.db.max_health}"
+        
+        if self.db.hits_given > 0:
+            appearance += f"\n|wHits Endured:|n {self.db.hits_given}"
+            
+        return appearance
