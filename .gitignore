@@ -3,3 +3,5 @@ pixarimud/server/logs
 pixarimud/server/evennia.db3
 pixarimud/server/*.pid
 
+.venv/
+.ruff_cache/

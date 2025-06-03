@@ -30,7 +30,6 @@ def at_server_start():
     This is called every time the server starts up, regardless of
     how it was shut down.
     """
-    pass
 
 
 def at_server_stop():

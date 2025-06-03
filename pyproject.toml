@@ -1,0 +1,17 @@
+[project]
+name = "pixarimud"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "evennia>=4.5.0",
+    "mysqlclient>=2.2.7",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "ruff>=0.11.2",
+]
