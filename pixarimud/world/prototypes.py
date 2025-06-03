@@ -88,3 +88,46 @@ See the `spawn` command and `evennia.prototypes.spawner.spawn` for more info.
 # "key": "goblin archwizard",
 # "prototype_parent" : ("GOBLIN_WIZARD", "ARCHWIZARD_MIXIN")
 # }
+
+
+# =============================================================================
+# PIXARIMUD DEMO PROTOTYPES
+# =============================================================================
+
+COMBAT_DUMMY = {
+    "key": "combat dummy",
+    "aliases": ["dummy", "training dummy"],
+    "typeclass": "typeclasses.objects.CombatDummy",
+    "desc": "A sturdy combat training dummy. You can 'hit dummy' to practice combat and gain experience.",
+    "tags": [("combat", "equipment"), ("demo", "system")]
+}
+
+BOTTOMLESS_PIT = {
+    "key": "bottomless pit", 
+    "aliases": ["pit", "hole", "abyss"],
+    "typeclass": "typeclasses.objects.BottomlessPit",
+    "desc": "A dark, seemingly bottomless pit. The depths are shrouded in darkness. You can 'jump pit' or 'jump in pit' if you dare...",
+    "tags": [("hazard", "environment"), ("demo", "system")]
+}
+
+WORN_DUMMY = {
+    "key": "worn-out dummy",
+    "aliases": ["worn", "old dummy", "broken dummy"],
+    "typeclass": "typeclasses.objects.WornOutDummy", 
+    "desc": "An old, worn-out combat dummy that looks like it's seen better days. You can 'hit dummy' to attack it, but be careful - it might break!",
+    "tags": [("combat", "equipment"), ("destructible", "equipment"), ("demo", "system")]
+}
+
+DEMO_ROOM = {
+    "key": "Combat Training Arena",
+    "aliases": ["arena", "training ground"],
+    "typeclass": "typeclasses.rooms.Room",
+    "desc": "A spacious training arena with high ceilings and reinforced walls. Various combat training equipment is scattered around the room. This is where warriors come to hone their skills and test new techniques."
+}
+
+RESPAWN_ROOM = {
+    "key": "Respawn Chamber",
+    "aliases": ["chamber", "sanctuary", "respawn"],
+    "typeclass": "typeclasses.rooms.Room", 
+    "desc": "A mystical chamber where fallen warriors return to life. The air shimmers with magical energy, and soft light emanates from crystalline formations on the walls. This is a safe place for the recently deceased."
+}

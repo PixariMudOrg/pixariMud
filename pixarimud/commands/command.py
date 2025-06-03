@@ -33,6 +33,195 @@ class Command(BaseCommand):
     pass
 
 
+class CmdHit(Command):
+    """
+    Hit a target to deal damage or train combat.
+    
+    Usage:
+        hit <target>
+        
+    Attack a combat dummy to gain experience, or hit other targets
+    for combat practice.
+    """
+    
+    key = "hit"
+    aliases = ["attack", "strike"]
+    help_category = "Combat"
+
+    def func(self):
+        """Execute the hit command."""
+        if not self.args:
+            self.caller.msg("Hit what?")
+            return
+            
+        target = self.caller.search(self.args)
+        if not target:
+            return
+            
+        # Check if target is in the same location
+        if target.location != self.caller.location:
+            self.caller.msg("You don't see that here.")
+            return
+            
+        # Check if target has a hit method (for special objects)
+        if hasattr(target, 'get_hit'):
+            target.get_hit(self.caller)
+        else:
+            self.caller.msg(f"You can't hit {target.key}.")
+
+
+class CmdJump(Command):
+    """
+    Jump into something.
+    
+    Usage:
+        jump <target>
+        jump in <target>
+        
+    Jump into dangerous places like bottomless pits.
+    Use with caution!
+    """
+    
+    key = "jump"
+    aliases = ["leap"]
+    help_category = "Movement"
+
+    def func(self):
+        """Execute the jump command."""
+        if not self.args:
+            self.caller.msg("Jump where?")
+            return
+            
+        # Handle "jump in pit" or "jump pit"
+        args = self.args.strip()
+        if args.startswith("in "):
+            args = args[3:]
+            
+        target = self.caller.search(args)
+        if not target:
+            return
+            
+        # Check if target is in the same location
+        if target.location != self.caller.location:
+            self.caller.msg("You don't see that here.")
+            return
+            
+        # Check if target has a jump_into method (for special objects)
+        if hasattr(target, 'jump_into'):
+            target.jump_into(self.caller)
+        else:
+            self.caller.msg(f"You can't jump into {target.key}.")
+
+
+class CmdStats(Command):
+    """
+    Display your character statistics.
+    
+    Usage:
+        stats
+        
+    Shows your current health, level, experience, and other
+    character information.
+    """
+    
+    key = "stats"
+    aliases = ["score", "status"]
+    help_category = "General"
+
+    def func(self):
+        """Display character stats."""
+        char = self.caller
+        
+        stats_display = f"""
+|w=== Character Statistics ===|n
+|wName:|n {char.key}
+|wLevel:|n {char.level}
+|wHealth:|n |{'g' if char.db.health > 20 else 'r'}{char.db.health}|n / {char.db.max_health}
+|wExperience:|n {char.db.experience}
+|wNext Level:|n {((char.level * 100) - char.db.experience)} XP needed
+"""
+        
+        char.msg(stats_display)
+
+
+class CmdSetRespawn(Command):
+    """
+    Set your respawn location.
+    
+    Usage:
+        setrespawn
+        
+    Sets your current location as your respawn point.
+    When you die, you will return here.
+    """
+    
+    key = "setrespawn"
+    aliases = ["respawn"]
+    help_category = "General"
+
+    def func(self):
+        """Set respawn location."""
+        char = self.caller
+        char.set_respawn_location(char.location)
+
+
+class CmdHeal(Command):
+    """
+    Heal yourself (for testing purposes).
+    
+    Usage:
+        heal [amount]
+        
+    Restore your health. If no amount is specified,
+    heal to full health.
+    """
+    
+    key = "heal"
+    help_category = "Combat"
+
+    def func(self):
+        """Heal the character."""
+        char = self.caller
+        
+        if self.args:
+            try:
+                amount = int(self.args)
+                char.heal(amount)
+            except ValueError:
+                char.msg("Heal amount must be a number.")
+        else:
+            # Full heal
+            old_health = char.db.health
+            char.db.health = char.db.max_health
+            heal_amount = char.db.health - old_health
+            if heal_amount > 0:
+                char.msg(f"|gYou heal for {heal_amount} health! ({char.db.health}/{char.db.max_health})|n")
+            else:
+                char.msg("You are already at full health.")
+
+
+class CmdSuicide(Command):
+    """
+    Kill your character (for testing death mechanics).
+    
+    Usage:
+        suicide
+        
+    This will immediately kill your character to test
+    the death and respawn system.
+    """
+    
+    key = "suicide"
+    help_category = "Combat"
+
+    def func(self):
+        """Kill the character."""
+        char = self.caller
+        char.msg("|rYou take your own life...|n")
+        char.db.health = 0
+        char.die()
+
+
 # -------------------------------------------------------------
 #
 # The default commands inherit from
