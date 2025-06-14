@@ -1,0 +1,64 @@
+#
+# Security System Demo Setup
+# This creates a demo area showcasing the keycard/vault door system
+#
+
+# First, create the security rooms
+@spawn SECURITY_LOBBY
+@tel Security Checkpoint
+
+# Create the other rooms
+@spawn SECURE_STORAGE
+@spawn LABORATORY  
+@spawn COMMAND_CENTER
+
+# Now create exits between rooms using vault doors
+
+# From Security Checkpoint to Secure Storage (requires security keycard)
+@spawn BASIC_VAULT_DOOR = security door north;north;n, Secure Storage Room
+# Return path
+@open south;s = Security Checkpoint
+
+# From Security Checkpoint to Laboratory (requires specific lab keycard)
+@spawn LAB_VAULT_DOOR = laboratory entrance east;east;e, Research Laboratory
+# Return path  
+@open west;w = Security Checkpoint
+
+# From Security Checkpoint to Command Center (requires master keycard)
+@spawn MASTER_VAULT_DOOR = command center door up;up;u, Command Center
+# Return path
+@open down;d = Security Checkpoint
+
+# Place some keycards in the Security Checkpoint for testing
+@tel Security Checkpoint
+@spawn STANDARD_KEYCARD
+@spawn SECURITY_KEYCARD
+@spawn LAB_KEYCARD
+@spawn ADMIN_KEYCARD
+
+# Place the master keycard in secure storage as a reward
+@tel Secure Storage Room  
+@spawn MASTER_KEYCARD
+
+# Add some flavor objects
+@tel Security Checkpoint
+@create/drop Security Terminal = A terminal displaying access level information: |wStandard|n < |ySecurity|n < |rAdmin|n < |mMaster|n. Lab areas require specific ID verification.
+
+@tel Research Laboratory
+@create/drop Experimental Device = A mysterious device humming with energy. It seems to be conducting some kind of important research.
+
+@tel Command Center
+@create/drop Master Control Console = The main control interface for the entire facility. From here, one could control every system in the complex.
+
+# Return to the checkpoint
+@tel Security Checkpoint
+
+# Done!
+@echo |gSecurity demo area created!|n
+@echo |wYou are in the Security Checkpoint with various keycards.|n
+@echo |yTry:|n 
+@echo - |wlook|n to see the room and keycards
+@echo - |wget keycard|n to pick up keycards  
+@echo - |wnorth|n to try the security door
+@echo - |weast|n to try the laboratory (needs specific lab keycard)
+@echo - |wup|n to try the command center (needs master keycard)

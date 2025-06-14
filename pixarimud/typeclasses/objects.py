@@ -425,3 +425,38 @@ class WornOutDummy(Object):
             appearance += f"\n|wHits Endured:|n {self.db.hits_given}"
             
         return appearance
+
+
+class Keycard(Object):
+    """
+    A security keycard that can unlock specific doors.
+    Can be customized with different access levels and descriptions.
+    """
+    
+    def at_object_creation(self):
+        """Set up the keycard."""
+        super().at_object_creation()
+        self.db.desc = "A standard security keycard with a magnetic strip and embedded chip."
+        self.db.access_level = "standard"
+        self.db.keycard_id = None  # Can be set for specific doors
+        self.locks.add("get:all()")  # Anyone can pick it up
+        
+    def return_appearance(self, looker, **kwargs):
+        """Customize appearance to show access level."""
+        appearance = super().return_appearance(looker, **kwargs)
+        
+        # Color-code by access level
+        access_colors = {
+            "standard": "w",
+            "security": "y", 
+            "admin": "r",
+            "master": "m"
+        }
+        color = access_colors.get(self.db.access_level, "w")
+        
+        appearance += f"\n|{color}Access Level: {self.db.access_level.title()}|n"
+        
+        if self.db.keycard_id:
+            appearance += f"\n|wID: {self.db.keycard_id}|n"
+            
+        return appearance
