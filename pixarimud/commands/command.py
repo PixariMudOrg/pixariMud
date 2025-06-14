@@ -115,13 +115,13 @@ class CmdJump(Command):
 
 class CmdStats(Command):
     """
-    Display your character statistics.
+    Display your robot statistics.
     
     Usage:
         stats
         
-    Shows your current health, level, experience, and other
-    character information.
+    Shows your current integrity, energy, level, experience,
+    and other robot information.
     """
     
     key = "stats"
@@ -131,15 +131,43 @@ class CmdStats(Command):
     def func(self):
         """Display character stats."""
         char = self.caller
+        char.ensure_stats_initialized()
         
+        # Calculate integrity and energy percentages
+        integrity_percent = int((char.db.chassis_integrity / char.db.max_integrity) * 100)
+        energy_percent = int((char.db.energy / char.db.max_energy) * 100)
+        
+        # Color coding for integrity
+        if integrity_percent > 50:
+            integrity_color = 'g'
+        elif integrity_percent > 20:
+            integrity_color = 'y'
+        else:
+            integrity_color = 'r'
+            
         stats_display = f"""
-|w=== Character Statistics ===|n
-|wName:|n {char.key}
+|w=== Robot Statistics ===|n
+|wDesignation:|n {char.key}
+|wType:|n {char.db.robot_type.title()}
 |wLevel:|n {char.level}
-|wHealth:|n |{'g' if char.db.health > 20 else 'r'}{char.db.health}|n / {char.db.max_health}
+
+|wChassis Integrity:|n |{integrity_color}{char.db.chassis_integrity}|n / {char.db.max_integrity} ({integrity_percent}%)
+|wEnergy:|n |{'g' if energy_percent > 30 else 'y' if energy_percent > 10 else 'r'}{char.db.energy}|n / {char.db.max_energy} ({energy_percent}%)
+
 |wExperience:|n {char.db.experience}
 |wNext Level:|n {((char.level * 100) - char.db.experience)} XP needed
+|wGold:|n {char.db.gold or 0}
+
+|wMovement:|n {char.db.movement_mode.title()}
+|wManipulation:|n Level {char.db.manipulation_level}
+|wSpeed:|n {char.db.speed}
+|wStrength:|n {char.db.strength}
+|wDefense:|n {char.db.defense}
 """
+        
+        # Add substance warning if contaminated
+        if char.db.substance_level > 0:
+            stats_display += f"\n|rSubstance Contamination:|n Level {char.db.substance_level}"
         
         char.msg(stats_display)
 
@@ -165,61 +193,242 @@ class CmdSetRespawn(Command):
         char.set_respawn_location(char.location)
 
 
-class CmdHeal(Command):
+class CmdRepair(Command):
     """
-    Heal yourself (for testing purposes).
+    Repair your robot chassis (for testing purposes).
     
     Usage:
+        repair [amount]
         heal [amount]
         
-    Restore your health. If no amount is specified,
-    heal to full health.
+    Restore your chassis integrity. If no amount is specified,
+    repair to full integrity.
     """
     
-    key = "heal"
+    key = "repair"
+    aliases = ["heal", "fix"]
     help_category = "Combat"
 
     def func(self):
-        """Heal the character."""
+        """Repair the robot."""
         char = self.caller
+        char.ensure_stats_initialized()
         
         if self.args:
             try:
                 amount = int(self.args)
                 char.heal(amount)
             except ValueError:
-                char.msg("Heal amount must be a number.")
+                char.msg("Repair amount must be a number.")
         else:
-            # Full heal
-            old_health = char.db.health
-            char.db.health = char.db.max_health
-            heal_amount = char.db.health - old_health
-            if heal_amount > 0:
-                char.msg(f"|gYou heal for {heal_amount} health! ({char.db.health}/{char.db.max_health})|n")
+            # Full repair
+            old_integrity = char.db.chassis_integrity
+            char.db.chassis_integrity = char.db.max_integrity
+            repair_amount = char.db.chassis_integrity - old_integrity
+            if repair_amount > 0:
+                char.msg(f"|gYou repair {repair_amount} integrity! ({char.db.chassis_integrity}/{char.db.max_integrity})|n")
             else:
-                char.msg("You are already at full health.")
+                char.msg("You are already at full integrity.")
 
 
-class CmdSuicide(Command):
+class CmdSelfDestruct(Command):
     """
-    Kill your character (for testing death mechanics).
+    Destroy your robot (for testing destruction mechanics).
     
     Usage:
+        selfdestruct
         suicide
         
-    This will immediately kill your character to test
-    the death and respawn system.
+    This will immediately destroy your robot chassis to test
+    the destruction and reconstruction system.
     """
     
-    key = "suicide"
+    key = "selfdestruct"
+    aliases = ["suicide"]
     help_category = "Combat"
 
     def func(self):
-        """Kill the character."""
+        """Destroy the robot."""
         char = self.caller
-        char.msg("|rYou take your own life...|n")
-        char.db.health = 0
+        char.ensure_stats_initialized()
+        char.msg("|rINITIATING SELF-DESTRUCT SEQUENCE...|n")
+        char.db.chassis_integrity = 0
         char.die()
+
+
+class CmdWhisper(Command):
+    """
+    Whisper to someone in the same room.
+    
+    Usage:
+        whisper <target> = <message>
+        
+    Send a private message to someone in the same room.
+    Only you and the target will see the message.
+    NPCs may react differently to whispers than normal speech.
+    """
+    
+    key = "whisper"
+    help_category = "Communication"
+
+    def parse(self):
+        """Parse the whisper command."""
+        # Split into target and message
+        if "=" in self.args:
+            self.target_name, self.message = [
+                part.strip() for part in self.args.split("=", 1)
+            ]
+        else:
+            self.target_name = self.args.strip()
+            self.message = ""
+
+    def func(self):
+        """Execute the whisper command."""
+        if not self.target_name:
+            self.caller.msg("Whisper to whom?")
+            return
+            
+        if not self.message:
+            self.caller.msg("What do you want to whisper?")
+            return
+            
+        # Find the target
+        target = self.caller.search(self.target_name)
+        if not target:
+            return
+            
+        # Check if target is in the same location
+        if target.location != self.caller.location:
+            self.caller.msg("You don't see them here.")
+            return
+            
+        # Can't whisper to yourself
+        if target == self.caller:
+            self.caller.msg("You mutter to yourself.")
+            return
+            
+        # Send the whisper
+        whisper_msg = f'{self.caller.key} whispers "{self.message}"'
+        target.msg(whisper_msg, from_obj=self.caller, type='whisper')
+        self.caller.msg(f'You whisper to {target.key}, "{self.message}"')
+        
+        # Others in the room see that whispering is happening
+        self.caller.location.msg_contents(
+            f"{self.caller.key} whispers something to {target.key}.",
+            exclude=[self.caller, target]
+        )
+
+
+class CmdSetFaction(Command):
+    """
+    Set your character's faction (for testing faction NPCs).
+    
+    Usage:
+        setfaction <faction_name>
+        
+    Available factions:
+        tech_consortium - Allied with technology
+        nature_cult - Reject technology, embrace nature
+        scavengers - Neutral opportunists
+        cyborg_union - Merged human and machine
+        
+    Use 'setfaction none' to clear your faction.
+    """
+    
+    key = "setfaction"
+    help_category = "General"
+
+    def func(self):
+        """Set character faction."""
+        if not self.args:
+            current = self.caller.db.faction or "none"
+            self.caller.msg(f"Your current faction: {current}")
+            self.caller.msg("Available factions: tech_consortium, nature_cult, " +
+                          "scavengers, cyborg_union")
+            return
+            
+        faction = self.args.strip().lower()
+        
+        # Normalize faction names
+        faction_map = {
+            'tech': 'tech_consortium',
+            'nature': 'nature_cult',
+            'scavenger': 'scavengers',
+            'cyborg': 'cyborg_union',
+            'none': None,
+            'clear': None
+        }
+        
+        # Get full faction name or use as-is
+        faction = faction_map.get(faction, faction.replace(' ', '_'))
+        
+        if faction and faction not in ['tech_consortium', 'nature_cult', 
+                                      'scavengers', 'cyborg_union']:
+            self.caller.msg("Unknown faction. Choose from: tech_consortium, " +
+                          "nature_cult, scavengers, cyborg_union")
+            return
+            
+        self.caller.db.faction = faction
+        
+        if faction:
+            self.caller.msg(f"You are now a member of the {faction.replace('_', ' ').title()}.")
+        else:
+            self.caller.msg("You are now factionless.")
+
+
+class CmdUse(Command):
+    """
+    Use an item in your inventory.
+    
+    Usage:
+        use <item>
+        drink <item>  (for potions)
+        read <item>   (for scrolls)
+        
+    Use consumable items like potions and scrolls.
+    """
+    
+    key = "use"
+    aliases = ["drink", "read", "consume"]
+    help_category = "General"
+
+    def func(self):
+        """Use an item."""
+        if not self.args:
+            self.caller.msg(f"{self.cmdstring.capitalize()} what?")
+            return
+            
+        # Find the item in inventory
+        item = self.caller.search(self.args, location=self.caller)
+        if not item:
+            return
+            
+        # Check if item has a use method
+        if hasattr(item, 'use'):
+            item.use(self.caller)
+        else:
+            self.caller.msg(f"You can't {self.cmdstring} {item.key}.")
+
+
+class CmdGold(Command):
+    """
+    Check your gold.
+    
+    Usage:
+        gold
+        money
+        
+    Display how much gold you have.
+    """
+    
+    key = "gold"
+    aliases = ["money", "coins"]
+    help_category = "General"
+
+    def func(self):
+        """Display gold amount."""
+        gold = self.caller.db.gold or 0
+        self.caller.msg(f"|wYou have {gold} gold.|n")
 
 
 # -------------------------------------------------------------

@@ -215,7 +215,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="pixariMud Demo Scripts")
     parser.add_argument("--demo", 
-                       choices=["combat", "death", "dummy", "progression", "npcs", "security", "full"],
+                       choices=["combat", "death", "dummy", "progression", "npcs", "security", "shop", "full"],
                        default="full",
                        help="Which demo to run")
     
@@ -255,6 +255,11 @@ def main():
             # Run the dedicated security demo script
             import subprocess
             result = subprocess.run([sys.executable, "tools/demo_security.py", "--demo", "full"])
+            success = result.returncode == 0
+        elif args.demo == "shop":
+            # Run the dedicated shop demo script
+            import subprocess
+            result = subprocess.run([sys.executable, "tools/demo_shop.py"])
             success = result.returncode == 0
         
         sys.exit(0 if success else 1)

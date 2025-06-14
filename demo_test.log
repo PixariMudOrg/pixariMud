@@ -1,0 +1,28 @@
+
+[1m[34m==============================================================[0m
+ Welcome to [1m[32mpixarimud[0m, version 4.5.0!
+
+ If you have an existing account, connect to it by typing:
+      [1m[37mconnect <username> <password>[0m
+ If you need to create an account, type (without the <>'s):
+      [1m[37mcreate <username> <password>[0m
+
+ If you have spaces in your username, enclose it in quotes.
+ Enter [1m[37mhelp[0m for more info. [1m[37mlook[0m will re-show this screen.
+[1m[34m==============================================================[0m
+
+Command: testaccount
+Response: Command 'testaccount' is not available. Maybe you meant "connect"?[0m
+
+Command: testpass
+Response: Command 'testpass' is not available. Type "help" for help.[0m
+
+Command: create testaccount testpass
+Response: You want to create an account 'testaccount' with password 'testpass'.
+Is this what you intended? [Y]/N?[0m
+
+Command: testpass
+Response: [22m[31mThis password is too common.[0m
+
+Command: TestChar
+Response: Command 'TestChar' is not available. Type "help" for help.[0m

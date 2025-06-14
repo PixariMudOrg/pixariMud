@@ -15,7 +15,11 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 """
 
 from evennia import default_cmds
-from .command import CmdHit, CmdJump, CmdStats, CmdSetRespawn, CmdHeal, CmdSuicide
+from .command import (CmdHit, CmdJump, CmdStats, CmdSetRespawn, CmdRepair, 
+                      CmdSelfDestruct, CmdWhisper, CmdSetFaction, CmdUse, CmdGold)
+from typeclasses.merchants import CmdShop
+from typeclasses.substance_system import CmdScanSubstance
+from typeclasses.factions import CmdCheckFaction, CmdAcceptSubstance
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -39,8 +43,16 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdJump())
         self.add(CmdStats())
         self.add(CmdSetRespawn())
-        self.add(CmdHeal())
-        self.add(CmdSuicide())
+        self.add(CmdRepair())
+        self.add(CmdSelfDestruct())
+        self.add(CmdWhisper())
+        self.add(CmdSetFaction())
+        self.add(CmdUse())
+        self.add(CmdGold())
+        self.add(CmdShop())
+        self.add(CmdScanSubstance())
+        self.add(CmdCheckFaction())
+        self.add(CmdAcceptSubstance())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

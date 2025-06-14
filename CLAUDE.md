@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is **pixariMud**, an Evennia-based MUD (Multi-User Dungeon) game. Evennia is a Python/Django framework for creating text-based multiplayer games. This repository contains game-specific customizations built on top of the Evennia engine.
 
+### Game Theme: Robot Awakening in the Underdark
+
+PixariMud features a narrative-driven experience where players control robots awakening in the depths of a dystopian city. The game combines survival mechanics, body customization, and faction-based gameplay in a dark sci-fi setting.
+
 ## Development Setup
 
 ```bash
@@ -115,6 +119,7 @@ All `evennia` commands must be run from the `pixarimud/` directory, not the repo
 - `max_health` - Maximum health capacity  
 - `experience` - Total XP earned (persistent across sessions)
 - `level` - Calculated from experience (100 XP per level)
+- `gold` - Currency for trading (starts at 50)
 
 **Key Methods:**
 - `gain_experience(amount)` - Awards XP and handles level-up
@@ -140,12 +145,18 @@ All `evennia` commands must be run from the `pixarimud/` directory, not the repo
 - `heal [amount]` - Restore health (testing command)
 - `setrespawn` - Set current location as respawn point
 - `suicide` - Test death mechanics (testing command)
+- `gold` - Check current gold amount
+- `use <item>` - Use consumable items
+- `shop` - Browse merchant wares when near a merchant
 
 **Aliases:**
 - `hit` → `attack`, `strike`
 - `jump` → `leap`  
 - `stats` → `score`, `status`
 - `setrespawn` → `respawn`
+- `gold` → `money`, `coins`
+- `use` → `drink`, `read`, `consume`
+- `shop` → `buy`, `browse`
 
 ### Interactive Objects
 **Location**: `pixarimud/typeclasses/objects.py`
@@ -167,7 +178,33 @@ All `evennia` commands must be run from the `pixarimud/` directory, not the repo
 - **Interface**: `get_hit(attacker)`, `die(killer)`, `respawn(location)` methods
 - **Behavior**: 100 HP, awards 1 XP per hit, respawns after 60 seconds when destroyed
 - **Usage**: `hit worn` repeatedly until destruction
-- **Features**: Uses TICKER_HANDLER for timed respawn
+- **Features**: Uses TICKER_HANDLER for timed respawn, drops 10 gold when destroyed
+
+### Shop and Trading System
+**Location**: `pixarimud/typeclasses/merchants.py`, `pixarimud/typeclasses/shop_items.py`
+
+#### NPCMerchant
+- **Purpose**: Merchant NPCs that can buy and sell items
+- **Interface**: `open_shop(shopper)` method opens EvMenu shop interface
+- **Features**: 
+  - Interactive menu system for browsing/buying/selling
+  - Items must have `gold_value` attribute to be sellable
+  - Merchants buy items at 50% of their value
+  - Shop command available when merchant is in room
+
+#### Shop Items
+**Available Item Types:**
+- **HealthPotion**: Consumable healing item (25-75 gold)
+- **IronSword/SteelSword**: Weapons that increase damage (100-250 gold)
+- **LeatherArmor/ChainMail**: Armor that reduces damage taken (150-300 gold)
+- **LuckyCharm**: Accessory that increases XP gain by 50% (200 gold)
+- **TeleportScroll**: Returns player to respawn point (50 gold)
+
+**Item Commands:**
+- `use <item>` - Use consumable items
+- `drink <potion>` - Consume potions
+- `read <scroll>` - Activate scrolls
+- Items with `equipment_slot` can be equipped (future feature)
 
 ### Object Creation and World Building
 
@@ -179,12 +216,23 @@ All `evennia` commands must be run from the `pixarimud/` directory, not the repo
 @spawn WORN_DUMMY
 @spawn DEMO_ROOM
 @spawn RESPAWN_ROOM
+
+# Shop system prototypes
+@spawn EQUIPMENT_MERCHANT
+@spawn POTION_SELLER
+@spawn HEALTH_POTION
+@spawn IRON_SWORD
+@spawn LEATHER_ARMOR
+@spawn MARKETPLACE
 ```
 
-**Batch Setup** (`world/demo_setup.ev`):
+**Batch Setup** (`world/demo_setup.ev`, `world/shop_demo_setup.ev`):
 ```bash
 # Run complete world setup
 @batchcommand world/demo_setup.ev
+
+# Set up shop system demo
+@batchcommand world/shop_demo_setup.ev
 ```
 
 **Manual Creation**:
@@ -379,6 +427,7 @@ python tools/demo_scripts.py --demo death       # Death/respawn mechanics
 python tools/demo_scripts.py --demo dummy       # Destructible objects
 python tools/demo_scripts.py --demo progression # Character leveling
 python tools/demo_scripts.py --demo security    # Keycard security system
+python tools/demo_scripts.py --demo shop        # Shop and trading system
 ```
 
 **Demo Features:**
@@ -443,3 +492,13 @@ python tools/demo_scripts.py --demo security    # Keycard security system
 - Use `evennia reload` instead of restart for faster development
 - Monitor logs in `pixarimud/server/logs/`
 - Check database locks: `@db_stats`
+
+## Robot Awakening Narrative Systems
+
+See `CLAUDE_robot_docs.md` for comprehensive documentation of the robot awakening narrative features, including:
+- Robot body assembly and part system
+- Scrap heap exploration mechanics  
+- The Substance contamination system
+- Three-faction political system
+- Multi-level world progression
+- Complete setup and demo instructions

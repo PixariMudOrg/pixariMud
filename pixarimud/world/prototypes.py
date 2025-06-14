@@ -348,3 +348,141 @@ COMMAND_CENTER = {
     "typeclass": "typeclasses.rooms.Room",
     "desc": "The nerve center of the facility. Banks of monitors display critical systems and security feeds. A massive holographic display dominates the center of the room. This is where all major decisions are made."
 }
+
+# =============================================================================
+# SHOP AND ITEM PROTOTYPES
+# =============================================================================
+
+# Shop NPCs
+EQUIPMENT_MERCHANT = {
+    "key": "Equipment Merchant",
+    "aliases": ["merchant", "shopkeeper", "vendor", "equipment"],
+    "typeclass": "typeclasses.merchants.NPCMerchant",
+    "desc": "A grizzled merchant surrounded by weapons and armor. Their shop is well-organized with various combat gear on display.",
+    "attrs": [
+        ("shopname", "Gear & Glory Equipment Shop"),
+        ("currency_name", "gold")
+    ],
+    "tags": [("merchant", "npc"), ("shop", "system"), ("demo", "system")]
+}
+
+POTION_SELLER = {
+    "key": "Potion Seller",
+    "aliases": ["alchemist", "potion merchant", "seller"],
+    "typeclass": "typeclasses.merchants.NPCMerchant",
+    "desc": "An elderly alchemist surrounded by bubbling flasks and mysterious vapors. They specialize in magical potions and elixirs.",
+    "attrs": [
+        ("shopname", "The Bubbling Cauldron"),
+        ("currency_name", "gold")
+    ],
+    "tags": [("merchant", "npc"), ("shop", "system"), ("demo", "system")]
+}
+
+# Shop Items
+HEALTH_POTION = {
+    "key": "health potion",
+    "aliases": ["potion", "red potion", "healing"],
+    "typeclass": "typeclasses.shop_items.HealthPotion",
+    "desc": "A small red potion that glows with healing energy. Use 'drink potion' to consume it.",
+    "attrs": [
+        ("gold_value", 25),
+        ("heal_amount", 50)
+    ],
+    "tags": [("consumable", "item"), ("shop", "system"), ("demo", "system")]
+}
+
+GREATER_HEALTH_POTION = {
+    "key": "greater health potion",
+    "aliases": ["greater potion", "large potion", "red flask"],
+    "typeclass": "typeclasses.shop_items.HealthPotion",
+    "desc": "A large flask filled with concentrated healing elixir. This powerful potion restores significant health.",
+    "attrs": [
+        ("gold_value", 75),
+        ("heal_amount", 150)
+    ],
+    "tags": [("consumable", "item"), ("shop", "system"), ("demo", "system")]
+}
+
+IRON_SWORD = {
+    "key": "iron sword",
+    "aliases": ["sword", "blade", "iron blade"],
+    "typeclass": "typeclasses.shop_items.IronSword",
+    "desc": "A well-crafted iron sword. When equipped, it increases your damage by 5.",
+    "attrs": [
+        ("gold_value", 100),
+        ("damage_bonus", 5),
+        ("equipment_slot", "weapon")
+    ],
+    "tags": [("equipment", "item"), ("weapon", "equipment"), ("shop", "system"), ("demo", "system")]
+}
+
+STEEL_SWORD = {
+    "key": "steel sword",
+    "aliases": ["sword", "steel blade", "fine sword"],
+    "typeclass": "typeclasses.shop_items.IronSword",
+    "desc": "A finely crafted steel sword with superior balance. When equipped, it increases your damage by 10.",
+    "attrs": [
+        ("gold_value", 250),
+        ("damage_bonus", 10),
+        ("equipment_slot", "weapon")
+    ],
+    "tags": [("equipment", "item"), ("weapon", "equipment"), ("shop", "system"), ("demo", "system")]
+}
+
+LEATHER_ARMOR = {
+    "key": "leather armor",
+    "aliases": ["armor", "leather", "vest"],
+    "typeclass": "typeclasses.shop_items.LeatherArmor",
+    "desc": "Sturdy leather armor. When equipped, it reduces damage taken by 3.",
+    "attrs": [
+        ("gold_value", 150),
+        ("defense_bonus", 3),
+        ("equipment_slot", "armor")
+    ],
+    "tags": [("equipment", "item"), ("armor", "equipment"), ("shop", "system"), ("demo", "system")]
+}
+
+CHAIN_MAIL = {
+    "key": "chain mail",
+    "aliases": ["chainmail", "mail", "chain armor"],
+    "typeclass": "typeclasses.shop_items.LeatherArmor",
+    "desc": "A shirt of interlocking metal rings. When equipped, it reduces damage taken by 5.",
+    "attrs": [
+        ("gold_value", 300),
+        ("defense_bonus", 5),
+        ("equipment_slot", "armor")
+    ],
+    "tags": [("equipment", "item"), ("armor", "equipment"), ("shop", "system"), ("demo", "system")]
+}
+
+LUCKY_CHARM = {
+    "key": "lucky charm",
+    "aliases": ["charm", "amulet", "pendant"],
+    "typeclass": "typeclasses.shop_items.LuckyCharm",
+    "desc": "A mysterious charm that brings good fortune. When equipped, you gain 50% more experience.",
+    "attrs": [
+        ("gold_value", 200),
+        ("xp_bonus", 0.5),
+        ("equipment_slot", "accessory")
+    ],
+    "tags": [("equipment", "item"), ("accessory", "equipment"), ("shop", "system"), ("demo", "system")]
+}
+
+TELEPORT_SCROLL = {
+    "key": "teleport scroll",
+    "aliases": ["scroll", "return scroll", "tp scroll"],
+    "typeclass": "typeclasses.shop_items.TeleportScroll",
+    "desc": "A magical scroll inscribed with teleportation runes. Use 'read scroll' to return to your respawn point.",
+    "attrs": [
+        ("gold_value", 50)
+    ],
+    "tags": [("consumable", "item"), ("shop", "system"), ("demo", "system")]
+}
+
+# Shop Demo Room
+MARKETPLACE = {
+    "key": "Central Marketplace",
+    "aliases": ["market", "shops", "plaza"],
+    "typeclass": "typeclasses.rooms.Room",
+    "desc": "A bustling marketplace filled with merchants hawking their wares. Colorful banners flutter overhead, and the air is filled with the sounds of commerce. Various shops line the edges of the plaza, each specializing in different goods."
+}

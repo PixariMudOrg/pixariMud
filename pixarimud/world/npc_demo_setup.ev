@@ -1,0 +1,112 @@
+#
+# NPC Demo Setup Batch Command File
+# 
+# This creates a demonstration world with various NPCs
+# Run with: @batchcommand world/npc_demo_setup.ev
+#
+
+# Create main demo areas if they don't exist
+@dig NPC Testing Hub
+#
+@desc NPC Testing Hub = A central hub for testing various NPC behaviors. Multiple corridors lead to specialized testing areas. Signs point to different sections: "Scanner Security", "Whisper Chambers", "Faction Territory", and "Market Square".
+
+# Create scanner bot area
+@dig/tel Scanner Security Zone = north,n;south,s = NPC Testing Hub
+#
+@desc Scanner Security Zone = A high-tech security checkpoint with gleaming metal walls and surveillance equipment. Red laser grids sweep across the room periodically. A large warning sign reads: "SCANNING IN PROGRESS - ALL ACTIVITIES MONITORED"
+
+# Spawn scanner bot
+@tel Scanner Security Zone
+@spawn SCANNER_BOT
+
+# Create whisper chambers
+@dig/tel Whisper Chambers = east,e;west,w = NPC Testing Hub  
+#
+@desc Whisper Chambers = A dimly lit chamber with sound-dampening panels on the walls. The air feels thick and muffled, absorbing all but the softest sounds. A small plaque reads: "Silence is golden, whispers are wisdom."
+
+# Spawn whisper bot
+@tel Whisper Chambers
+@spawn WHISPER_BOT
+
+# Create faction territories
+@dig/tel Tech Consortium Checkpoint = northeast,ne;southwest,sw = NPC Testing Hub
+#
+@desc Tech Consortium Checkpoint = A fortified checkpoint adorned with the chrome and blue colors of the Tech Consortium. Holographic displays show security alerts and faction propaganda. The hum of advanced technology fills the air.
+
+# Spawn tech guard
+@tel Tech Consortium Checkpoint
+@spawn FACTION_GUARD
+
+# Create nature cult area
+@dig/tel Nature Cult Grove = northwest,nw;southeast,se = NPC Testing Hub
+#
+@desc Nature Cult Grove = A small indoor grove where nature has reclaimed technology. Vines wrap around defunct machinery, and bioluminescent fungi provide soft lighting. The air smells of earth and growing things.
+
+# Spawn nature guard
+@tel Nature Cult Grove
+@spawn NATURE_GUARD
+
+# Create market square
+@dig/tel Market Square = south,s;north,n = NPC Testing Hub
+#
+@desc Market Square = A bustling marketplace where traders from all factions come to barter. Makeshift stalls line the walls, displaying various goods. The sound of haggling and commerce fills the air.
+
+# Spawn merchant
+@tel Market Square
+@spawn MERCHANT_NPC
+
+# Create scavenger outpost  
+@dig/tel Scavenger Outpost = west,w;east,e = Market Square
+#
+@desc Scavenger Outpost = A ramshackle outpost built from salvaged materials. Everything here has been repurposed at least twice. Lookouts keep watch from elevated positions cobbled together from old shipping containers.
+
+# Spawn scavenger lookout
+@tel Scavenger Outpost
+@spawn SCAVENGER_LOOKOUT
+
+# Add some interactive objects to the areas
+@tel Scanner Security Zone
+@spawn COMBAT_DUMMY
+@desc combat dummy = A reinforced training dummy marked with Tech Consortium insignia. It's designed to withstand security testing procedures.
+
+@tel Nature Cult Grove  
+@spawn WORN_DUMMY
+@desc worn-out dummy = An ancient training dummy wrapped in vines and moss. The nature cult uses it to practice their combat techniques.
+
+@tel Market Square
+@spawn BOTTOMLESS_PIT
+@desc bottomless pit = A mysterious pit in the corner of the market. Local legend says it leads to the old tunnels beneath the city. Merchants warn customers to stay away.
+
+# Create a respawn room for the demo
+@tel NPC Testing Hub
+@dig/tel Central Respawn Chamber = down,d;up,u
+#
+@desc Central Respawn Chamber = The main respawn chamber for this facility. Resurrection technology hums quietly in the walls. This is where you'll return if you meet an untimely end during testing.
+
+# Return to hub
+@tel NPC Testing Hub
+
+# Final setup message
+@echo
+@echo |y============================================|n
+@echo |yNPC Demo World Setup Complete!|n
+@echo |y============================================|n
+@echo
+@echo The following NPCs have been created:
+@echo - Scanner Bot (Scanner Security Zone)
+@echo - Whispering Guide (Whisper Chambers)  
+@echo - Tech Consortium Guard (Tech Consortium Checkpoint)
+@echo - Nature Cult Guardian (Nature Cult Grove)
+@echo - Traveling Merchant (Market Square)
+@echo - Scavenger Lookout (Scavenger Outpost)
+@echo
+@echo Interactive objects have also been placed for testing.
+@echo
+@echo |wUseful commands:|n
+@echo - whisper <npc> = <message> - Whisper to NPCs
+@echo - setfaction <faction> - Change your faction allegiance
+@echo - say <message> - Speak normally (some NPCs react differently)
+@echo - look <npc> - Examine NPCs
+@echo
+@echo |gEnjoy testing the NPCs!|n
+@echo

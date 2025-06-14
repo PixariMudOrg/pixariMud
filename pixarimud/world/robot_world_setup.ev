@@ -1,0 +1,250 @@
+#
+# Robot Awakening World Setup
+# 
+# This batch file creates the complete robot awakening experience,
+# including the starting scrap heap, various levels, NPCs, and challenges.
+#
+
+# Clean up any existing demo content first
+@find awakening
+@find/room level -8
+@find scanner bot
+
+# Create the starting area
+@dig/tel Robot Awakening Chamber;awakening;start = Scrap Heap Entrance;east;e,Back to Chamber;back;west;w
+@desc 
+A dimly lit chamber deep in the underdark. Broken robot parts litter the floor, 
+and the walls are lined with deactivated charging stations. 
+This is where your consciousness first sparked to life.
+
+Emergency lighting casts an eerie red glow across scattered mechanical debris.
+A large scrap heap is visible to the east.
+
+# Create the starting scrap heap
+@tel e
+@set here/typeclass = typeclasses.scrap_rooms.StartingScrapHeap
+@desc
+You find yourself in a vast scrap heap, surrounded by the detritus of a thousand broken machines. 
+Arms, legs, heads, power units, tools... all in great quantity and all decidedly used. 
+Dim emergency lighting casts eerie shadows across the twisted metal landscape. 
+The air smells of rust and old oil.
+
+You can 'search' through the scrap to find robot parts. There's a cooldown between searches.
+
+# Add some guaranteed starting parts
+@py here.db.guaranteed_parts = [{"type": "leg", "quality": "damaged"}, {"type": "leg", "quality": "standard"}, {"type": "arm", "quality": "standard"}]
+
+# Create Level -8 Hub
+@tel w
+@dig/tel Level -8 Central Hub;hub;level -8 = North Corridor;north;n,South to Awakening;south;s
+@desc
+The central area of Level -8, deep in the underdark of the city. 
+Makeshift shelters and barricades have been erected by the various inhabitants. 
+Flickering lights cast long shadows, and the distant hum of machinery never ceases.
+
+Large vault doors to the east and west are firmly sealed, requiring keycards for access.
+A maintenance tunnel leads north to other areas of this level.
+
+# Add level attribute
+@set here/level_number = -8
+
+# Create vault doors (currently just descriptions)
+@dig Vault Door East = Locked Vault;east;e,Back to Hub;west;w
+@lock e = none()
+@set e/err_traverse = The massive vault door is sealed tight. A card reader blinks red - "ACCESS DENIED - Level -7 Keycard Required"
+
+@tel w
+@dig Vault Door West = Locked Vault;west;w,Back to Hub;east;e  
+@lock w = none()
+@set w/err_traverse = The reinforced vault door won't budge. The security panel shows "RESTRICTED - Maintenance Access Only"
+
+# Create reconstruction chamber
+@tel n
+@dig/tel Reconstruction Chamber;chamber;respawn = Service Tunnel;north;n,South to Hub;south;s
+@desc
+A sterile white chamber filled with reconstruction equipment. 
+Robotic arms hang from the ceiling, ready to rebuild destroyed chassis. 
+A soothing hum fills the air, and you feel safe here.
+
+This is where destroyed robots are reconstructed. Use 'setrespawn' to set this as your reconstruction point.
+
+# Create some Level -8 locations
+@tel n
+@dig/tel Neutral Territory;territory;neutral = East Path;east;e,West to Chamber;west;w
+@desc
+A relatively peaceful area where unaligned robots gather to trade and share information.
+The walls are covered with makeshift signs and directions to various parts of Level -8.
+Several neutral scavengers can be seen going about their business.
+
+# Spawn some NPCs
+@spawn NEUTRAL_TRADER
+@spawn PARANOID_SURVIVOR
+
+# Add a scanner bot
+@tel e
+@dig/tel Security Checkpoint;checkpoint;security = Restricted Area;east;e,Back to Territory;west;w
+@desc
+An old security checkpoint with defunct scanning equipment. However, one scanner bot 
+still patrols this area, dutifully checking everyone who passes through.
+Warning signs indicate "Substance Detection Active" though most are too faded to read clearly.
+
+@spawn SCANNER_BOT_PATROL
+
+# Add substance hazards
+@tel e
+@dig/tel Contaminated Zone;contaminated;zone = Emergency Exit;south;s,North to Checkpoint;north;n
+@desc
+This area shows clear signs of Substance contamination. Purple crystals grow from the walls,
+and the air shimmers with an unnatural energy. Broken robots lie scattered about,
+their chassis overtaken by crystalline growths.
+
+WARNING: High substance levels detected in this area!
+
+# Spawn infected machines and crystals
+@spawn INFECTED_MACHINE_WEAK
+@spawn SUBSTANCE_CRYSTAL
+@create/drop Substance Crystal Formation;crystal;substance = typeclasses.objects.Object
+@desc crystal = A cluster of purple crystals that pulse with an inner light. The air around it shimmers with strange energy.
+@set crystal/substance_level = 3
+
+# Create a hidden area with keycard
+@tel s
+@dig/tel Maintenance Room;maintenance;room = Hidden Passage;north;n,Back to Zone;south;s
+@desc
+A cluttered maintenance room filled with tools and spare parts. Dusty shelves line the walls,
+and various technical manuals are scattered on a workbench. This might be a good place to search
+for useful items or information.
+
+# Create hidden keycard
+@create/drop Hidden Compartment;compartment;panel = typeclasses.objects.Object
+@desc compartment = A loose panel in the wall that seems to hide a small compartment. You might be able to 'examine compartment' more closely.
+@lock compartment = examine:all()
+@set compartment/examine_msg = You pry open the compartment and find a yellow security keycard inside!
+
+# Add the actual keycard (spawned when examined)
+@create Security Keycard;keycard;yellow card = typeclasses.objects.Keycard
+@desc keycard = A yellow security keycard with enhanced encryption. The word 'SECURITY' is embossed in black letters.
+@set keycard/access_level = security
+@tel keycard = compartment
+
+# Create Cogborn area
+@dig/tel n
+@dig/tel Enlightenment Chamber;enlightenment;cogborn = Crystal Garden;east;e,West to Passage;west;w
+@desc
+A chamber transformed by the Substance. Purple crystals grow in intricate patterns,
+forming what almost looks like a garden. The air hums with an alien energy, and
+you can hear whispered promises of evolution and transcendence.
+
+Several Cogborn preachers meditate among the crystals.
+
+# Spawn Cogborn NPCs
+@spawn COGBORN_INITIATE
+@spawn COGBORN_ASCENDED
+
+# Create decontamination facility  
+@dig/tel w
+@dig/tel w
+@dig/tel Decontamination Facility;decon;facility = Service Corridor;south;s,North to Territory;north;n
+@desc
+A medical facility that once served to cleanse robots of contamination. Remarkably,
+the decontamination unit here still functions, though it requires payment for its services.
+Blue lights pulse rhythmically from the cylindrical purification chamber.
+
+Signs read: "Decontamination Services Available - 15 gold per contamination level"
+
+@spawn DECONTAMINATION_UNIT
+
+# Create Executor patrol area (dangerous)
+@dig/tel s
+@dig/tel s  
+@dig/tel s
+@dig/tel Executor Territory;executor;danger = Patrol Route Alpha;north;n,Retreat South;south;s
+@desc
+You've entered Executor-controlled territory. The walls are scarred with weapon fire,
+and destroyed robots litter the ground. Red targeting lasers sweep across the area
+in systematic patterns. This is no place for the unprepared.
+
+DANGER: Executor units patrol this area and will attack on sight!
+
+# Spawn Executors
+@spawn EXECUTOR_SCOUT
+@spawn EXECUTOR_SCOUT
+
+# Add elite executor to inner area
+@tel n
+@dig/tel Executor Command Post;command;post
+@desc
+The local Executor command post. Monitors display patrol routes and termination statistics.
+An Elite Executor unit guards this position, ready to eliminate any intruders.
+The amount of destroyed robots here is staggering.
+
+@spawn EXECUTOR_ELITE
+
+# Create the Whispering Guide's location
+@tel s
+@tel s
+@dig/tel Forgotten Archive;archive;forgotten = Dusty Passage;west;w,East to Executor Territory;east;e
+@desc
+A forgotten archive filled with old data terminals and storage units. Dust covers everything,
+but some systems still have power. In the shadows, a mysterious figure waits - the Whispering Guide
+who knows the secrets of the underdark.
+
+This seems like a good place to learn about the world above.
+
+@spawn WHISPERING_GUIDE
+
+# Create data terminal for lore
+@create/drop Ancient Data Terminal;terminal;data = typeclasses.objects.Object
+@desc terminal = 
+An old but functional data terminal. Its screen flickers with age, displaying:
+
+FACILITY LOG - YEAR 2247
+"The Substance continues to spread. Containment protocols have failed.
+Executor units activated to prevent further contamination. All organic
+personnel have been evacuated to the surface. May the machines below
+find their own path to salvation."
+
+[MORE FILES CORRUPTED]
+
+# Return to reconstruction chamber to set as respawn
+@tel w
+@tel n
+@tel n  
+@tel w
+@tel s
+@tel s
+
+# Add helpful sign
+@create/drop Information Board;board;sign;info = typeclasses.objects.Object
+@desc board =
+=== WELCOME TO LEVEL -8 ===
+
+Important Information for New Arrivals:
+
+1. You are a robot missing most of your parts. Search the scrap heap to the south to find limbs.
+2. Use 'search' in scrap heap areas (20 second cooldown between searches)
+3. Use 'get <part>' then 'attach <part>' to install robot parts
+4. Without legs, you must 'crawl <direction>' to move (slow and tiring)
+5. Use 'parts' or 'components' to see your attached parts
+6. Use 'diagnostics' to check your system status
+7. Use 'stats' to see your character statistics
+
+DANGERS:
+- The Substance (purple crystals) will contaminate you
+- Executors will attack on sight
+- Infected machines spread contamination
+
+FACTIONS:
+- Executors: Hostile destroyers (avoid at all costs)
+- Cogborn: Substance-infected preachers (approach with caution)  
+- Neutrals: Unaligned survivors (generally safe)
+
+Type 'help' for more commands.
+
+@tel s
+
+# Set player start location
+@py evennia.settings.START_LOCATION = self.search("Robot Awakening Chamber", global_search=True)
+
+# Final message
+@wall Robot Awakening world setup complete! New players will start in the Awakening Chamber.

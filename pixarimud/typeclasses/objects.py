@@ -372,6 +372,12 @@ class WornOutDummy(Object):
                 f"|r{killer.key} has destroyed the {self.key}!|n", 
                 exclude=killer
             )
+            
+            # Award bonus gold for destroying the dummy
+            gold_reward = 10
+            if hasattr(killer, 'db') and hasattr(killer.db, 'gold'):
+                killer.db.gold = (killer.db.gold or 0) + gold_reward
+                killer.msg(f"|yYou found {gold_reward} gold in the wreckage!|n")
         
         self.location.msg_contents(
             f"|rThe {self.key} collapses into pieces!|n"

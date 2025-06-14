@@ -1,0 +1,45 @@
+#
+# Shop System Demo Setup
+# 
+# This batch file creates a shop demonstration area with merchants and items.
+# Run with: @batchcommand world/shop_demo_setup.ev
+#
+
+# Create the marketplace
+@dig/tel Central Marketplace
+@desc here = A bustling marketplace filled with merchants hawking their wares. Colorful banners flutter overhead, and the air is filled with the sounds of commerce. Various shops line the edges of the plaza, each specializing in different goods.
+
+# Create merchant NPCs
+@spawn EQUIPMENT_MERCHANT
+@spawn POTION_SELLER
+
+# Stock the equipment merchant with items
+@spawn IRON_SWORD : equipment merchant
+@spawn STEEL_SWORD : equipment merchant  
+@spawn LEATHER_ARMOR : equipment merchant
+@spawn CHAIN_MAIL : equipment merchant
+@spawn LUCKY_CHARM : equipment merchant
+
+# Stock the potion seller with consumables
+@spawn HEALTH_POTION : potion seller
+@spawn HEALTH_POTION : potion seller
+@spawn HEALTH_POTION : potion seller
+@spawn GREATER_HEALTH_POTION : potion seller
+@spawn GREATER_HEALTH_POTION : potion seller
+@spawn TELEPORT_SCROLL : potion seller
+@spawn TELEPORT_SCROLL : potion seller
+@spawn TELEPORT_SCROLL : potion seller
+
+# Create a training area connected to the marketplace
+@dig/tel Combat Training Arena;arena = north;n,south;s = Central Marketplace
+@desc here = A spacious training arena with high ceilings and reinforced walls. Various combat training equipment is scattered around the room. This is where warriors come to hone their skills and test new techniques.
+
+# Add combat dummies to the training area
+@spawn COMBAT_DUMMY
+@spawn WORN_DUMMY
+
+# Create an exit back to limbo for convenience
+@open exit to limbo;limbo = #2
+
+# Notify completion
+@wall Shop demo area created! Visit the Central Marketplace to test the shop system. Use 'shop' or 'buy' near a merchant to browse their wares. Check your gold with the 'gold' command. Don't forget to test consumables with 'use' or 'drink' commands!
