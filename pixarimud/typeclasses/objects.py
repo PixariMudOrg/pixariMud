@@ -387,6 +387,9 @@ class WornOutDummy(Object):
         respawn_location = self.db.respawn_location
         respawn_timer = self.db.respawn_timer
         
+        # Store the respawn location for the callback
+        self.db.pending_respawn_location = respawn_location
+        
         # Remove from game temporarily
         self.move_to(None, quiet=True)
         
@@ -395,17 +398,23 @@ class WornOutDummy(Object):
             interval=respawn_timer,
             callback=self.respawn,
             idstring=f"respawn_{self.id}",
-            kwargs={"location": respawn_location}
+            persistent=False
         )
         
         respawn_location.msg_contents(
             f"|gA new {self.key} will appear here in {respawn_timer} seconds.|n"
         )
 
-    def respawn(self, location):
+    def respawn(self):
         """
-        Respawn the dummy at the specified location.
+        Respawn the dummy at the stored location.
         """
+        # Get the stored respawn location
+        location = self.db.pending_respawn_location
+        if not location:
+            # Fallback to original respawn location
+            location = self.db.respawn_location
+        
         # Reset stats
         self.db.health = self.db.max_health
         
@@ -416,6 +425,9 @@ class WornOutDummy(Object):
         location.msg_contents(
             f"|gA new {self.key} has appeared!|n"
         )
+        
+        # Clean up
+        self.db.pending_respawn_location = None
         
         # Remove the ticker
         TICKER_HANDLER.remove(idstring=f"respawn_{self.id}")

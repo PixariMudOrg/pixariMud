@@ -250,8 +250,8 @@ class CmdSearch(Command):
     are guaranteed to appear eventually.
     """
     
-    key = "search"
-    aliases = ["scavenge", "dig", "rummage"]
+    key = "rummage"
+    aliases = ["scavenge", "dig", "forage"]
     
     # Search cooldown in seconds
     cooldown_duration = 20

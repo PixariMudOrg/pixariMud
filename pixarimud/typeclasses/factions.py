@@ -630,7 +630,7 @@ class CmdCheckFaction(Command):
         # Reputation with each faction
         self.caller.msg("\n|wReputation:|n")
         
-        if not hasattr(char.db, "faction_reputation"):
+        if not hasattr(char.db, "faction_reputation") or char.db.faction_reputation is None:
             char.db.faction_reputation = {}
             
         for faction_id, faction_data in fm.factions.items():

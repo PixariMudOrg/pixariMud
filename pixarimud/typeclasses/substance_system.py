@@ -484,6 +484,9 @@ class CmdScanSubstance(Command):
     
     def func(self):
         level = getattr(self.caller.db, "substance_level", 0)
+        if level is None:
+            level = 0
+            self.caller.db.substance_level = 0
         
         self.caller.msg("|m=== Substance Contamination ===|n")
         self.caller.msg(f"|wCurrent Level:|n {level}/10")

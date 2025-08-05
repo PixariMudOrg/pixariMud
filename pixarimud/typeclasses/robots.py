@@ -159,20 +159,28 @@ class RobotCharacter(DefaultCharacter):
         
     def count_legs(self):
         """Return number of attached legs."""
+        if not hasattr(self.db, "attached_parts") or self.db.attached_parts is None:
+            self.db.attached_parts = {}
         return sum(1 for slot in ["left_leg", "right_leg"] 
                   if self.db.attached_parts.get(slot))
                   
     def count_arms(self):
         """Return number of attached arms."""
+        if not hasattr(self.db, "attached_parts") or self.db.attached_parts is None:
+            self.db.attached_parts = {}
         return sum(1 for slot in ["left_arm", "right_arm"] 
                   if self.db.attached_parts.get(slot))
                   
     def has_head(self):
         """Check if head is attached."""
+        if not hasattr(self.db, "attached_parts") or self.db.attached_parts is None:
+            self.db.attached_parts = {}
         return bool(self.db.attached_parts.get("head"))
         
     def has_torso(self):
         """Check if torso is attached."""
+        if not hasattr(self.db, "attached_parts") or self.db.attached_parts is None:
+            self.db.attached_parts = {}
         return bool(self.db.attached_parts.get("torso"))
         
     def recalculate_stats(self):

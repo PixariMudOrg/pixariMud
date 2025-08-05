@@ -1,0 +1,17 @@
+#
+# Test the WornOutDummy respawn mechanism
+#
+
+# Create test area
+@dig/tel Test Respawn Arena
+#
+# Create a worn-out dummy with fast respawn
+@create/drop Test Dummy:typeclasses.objects.WornOutDummy
+#
+# Set respawn timer to 5 seconds for quick testing
+@py self.location.contents[-1].db.respawn_timer = 5
+#
+# Show initial state
+look dummy
+#
+@echo |y>>> Starting respawn test. The dummy will be destroyed and should respawn in 5 seconds.|n
