@@ -409,12 +409,16 @@ class WornOutDummy(Object):
         """
         Respawn the dummy at the stored location.
         """
-        # Get the stored respawn location
+        from evennia.utils import logger
+
         location = self.db.pending_respawn_location
         if not location:
-            # Fallback to original respawn location
-            location = self.db.respawn_location
-        
+            logger.log_err(
+                f"WornOutDummy '{self.key}' (#{self.id}) respawn triggered with no "
+                "pending_respawn_location. This indicates a bug in die()."
+            )
+            return
+
         # Reset stats
         self.db.health = self.db.max_health
         

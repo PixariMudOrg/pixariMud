@@ -39,9 +39,9 @@ class Character(ObjectParent, RobotCharacter):
         self.db.respawn_location = self.location
         
         # Start with only right arm attached (as per narrative)
+        from evennia import create_object
         from typeclasses.robot_parts import RobotArm
-        starting_arm = RobotArm(key="Basic Right Arm")
-        starting_arm.save()
+        starting_arm = create_object(RobotArm, key="Right Robot Arm")
         starting_arm.db.part_slot = "right_arm"
         starting_arm.db.quality = "standard"
         starting_arm.db.material = "worn steel"
